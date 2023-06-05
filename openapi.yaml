@@ -1,0 +1,81 @@
+openapi: 3.0.0
+info:
+  title: Payment API
+  version: 1.0.0
+servers:
+  - url: https://bpt70mko6e.execute-api.ap-northeast-1.amazonaws.com/prod
+paths:
+  /payment-info:
+    post:
+      summary: カード情報を決済システムに登録して、UUIDを返却する
+      description: カード情報を決済システムに登録する。この時点では、決済は行わず、UUIDによるIDを返却する。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                card_number:
+                  type: string
+                card_expiration_date:
+                  type: string
+                card_holder_name:
+                  type: string
+                card_cvv:
+                  type: string
+                order_amount:
+                  type: string
+                order_currency:
+                  type: string
+      responses:
+        '201':
+          description: A UUID of registered card
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+        '400':
+          description: Invalid Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /execute:
+    post:
+      summary: 登録されたUUIDの決済を実行する
+      description: 有効なUUIDの場合はstatusは'success'という文字列を固定で返却する。有効でないUUIDの場合は'failure'という文字列を返却する。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uuid:
+                  type: string
+      responses:
+        '201':
+          description: The result of the execution
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
