@@ -53,6 +53,33 @@ describe('SuperPayment', () => {
       expect(res).toEqual(expected);
     });
 
+    it('should be ok when card_expiration_date is now', async () => {
+      // Arrange
+      const uuidRegex = new RegExp('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$');
+      const now = new Date();
+      const nowCardExpirationDate = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear().toString().slice(-2)}`;
+      const params = {
+        body: JSON.stringify({
+          "card_number": "1234567890123456",
+          "card_expiration_date": nowCardExpirationDate,
+          "card_holder_name": "John Doe",
+          "card_cvv": "123",
+          "order_amount": "15000",
+          "order_currency": "JPY"
+        })
+      };
+      const expected = {
+        "statusCode": 201,
+      };
+
+      // Act
+      const res = await ut.handler(params);
+
+      // Assert
+      expect(res.statusCode).toEqual(expected.statusCode);
+      expect(uuidRegex.test(JSON.parse(res.body).uuid)).toBeTruthy();
+    });
+
     it('should throw error when card_expiration_date is invalid', async () => {
       // Arrange
       const params = {
@@ -68,6 +95,30 @@ describe('SuperPayment', () => {
       const expected = {
         "statusCode": 400,
         "body": "{\"message\":\"Invalid card expiration date\"}"
+      };
+
+      // Act
+      const res = await ut.handler(params);
+
+      // Assert
+      expect(res).toEqual(expected);
+    });
+
+    it('should throw error when card_expiration_date is expired', async () => {
+      // Arrange
+      const params = {
+        body: JSON.stringify({
+          "card_number": "1234567890123456",
+          "card_expiration_date": "01/13",
+          "card_holder_name": "John Doe",
+          "card_cvv": "123",
+          "order_amount": "15000",
+          "order_currency": "JPY"
+        })
+      };
+      const expected = {
+        "statusCode": 400,
+        "body": "{\"message\":\"Card is expired\"}"
       };
 
       // Act

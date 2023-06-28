@@ -13,6 +13,10 @@ exports.handler = async (event: any) => {
       throw new Error('Invalid card expiration date');
     }
 
+    if (isExpiredExpirationDate(props.card_expiration_date)) {
+      throw new Error('Card is expired');
+    }
+
     if (!isvalidcardholdername(props.card_holder_name)) {
       throw new Error('Invalid card holder name');
     }
@@ -53,6 +57,16 @@ const isvalidcardnumber = (card_number: string) => {
 const isvalidcardexpirationdate = (card_expiration_date: string) => {
   const regex = new RegExp('^[0-9]{2}/[0-9]{2}$');
   return regex.test(card_expiration_date);
+}
+
+const isExpiredExpirationDate = (card_expiration_date: string) => {
+  const now = new Date();
+  const year = now.getFullYear().toString().slice(-2);
+  const month = now.getMonth() + 1;
+
+  const [card_expiration_month, card_expiration_year] = card_expiration_date.split('/');
+
+  return parseInt(card_expiration_year) < parseInt(year) || (parseInt(card_expiration_year) === parseInt(year) && parseInt(card_expiration_month) < month);
 }
 
 const isvalidcardholdername = (card_holder_name: string) => {
