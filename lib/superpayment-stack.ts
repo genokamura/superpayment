@@ -7,15 +7,16 @@ export class SuperpaymentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const corsOptions: apigateway.CorsOptions = {
+      allowOrigins: apigateway.Cors.ALL_ORIGINS,
+      allowMethods: apigateway.Cors.ALL_METHODS,
+      allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+    };
+
     const api = new apigateway.RestApi(this, 'superpayment-api', {
       restApiName: 'Superpayment Service',
       description: 'This service serves payment information.',
-      // allow from any origin
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
-      },
+      defaultCorsPreflightOptions: corsOptions,
     });
 
     const paymentInfoLambda = new lambda.NodejsFunction(this, 'payment-info', {
@@ -27,6 +28,7 @@ export class SuperpaymentStack extends cdk.Stack {
 
     const paymentinfo = api.root.addResource('payment-info');
     const execute = api.root.addResource('execute');
+
     paymentinfo.addMethod('POST', new apigateway.LambdaIntegration(paymentInfoLambda));
     execute.addMethod('POST', new apigateway.LambdaIntegration(executeLambda));
   }

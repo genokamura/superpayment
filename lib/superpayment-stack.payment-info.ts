@@ -35,6 +35,9 @@ exports.handler = async (event: any) => {
   } catch (e: any) {
     return {
       statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify({
         message: e.message,
       }),
@@ -43,6 +46,9 @@ exports.handler = async (event: any) => {
 
   return {
     statusCode: 201,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     body: JSON.stringify({
       uuid : id,
     }),

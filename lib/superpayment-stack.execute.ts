@@ -4,6 +4,9 @@ exports.handler = async (event: any) => {
   if (!isvaliduuid(props.uuid)) {
     return {
       statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify({
         message: 'failure',
       }),
@@ -12,6 +15,9 @@ exports.handler = async (event: any) => {
 
   return {
     statusCode: 201,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
     body: JSON.stringify({
       status: 'success',
     }),
