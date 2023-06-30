@@ -10,6 +10,12 @@ export class SuperpaymentStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'superpayment-api', {
       restApiName: 'Superpayment Service',
       description: 'This service serves payment information.',
+      // allow from any origin
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
     });
 
     const paymentInfoLambda = new lambda.NodejsFunction(this, 'payment-info', {
